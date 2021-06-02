@@ -32,7 +32,7 @@ class MainWindow:
                                        variable=self.cb_prefetch_value, command=self.check_uncheck_parent)
         self.cb_prefetch.grid(row=4, column=0, sticky="w", padx=30)
 
-        self.cb_temp_files_child = [self.cb_temp, self.cb_temp2, self.cb_prefetch]
+        self.cb_temp_files_children = [self.cb_temp, self.cb_temp2, self.cb_prefetch]
 
         self.cb_event_log = BooleanVar()
         Checkbutton(cb_frame, text="Registro Visor Eventos", onvalue=True, offvalue=False,
@@ -49,8 +49,8 @@ class MainWindow:
                     variable=self.cb_downloads).grid(row=7, column=0, sticky="w", padx=20)
 
         self.btn_clean = Button(root, text="Limpiar", bg="#3f74d4", fg="#eeeeee", pady=10, padx=10, borderwidth=0,
-                                font=(None, 10), command=lambda: self.clear()).grid(row=9, column=1, padx=20,
-                                                                                    pady=(0, 20), sticky="e")
+                                font=(None, 10), command=self.clear).grid(row=9, column=1, padx=20,
+                                                                          pady=(0, 20), sticky="e")
 
         self.lst = Listbox(root, borderwidth=0, highlightthickness=0, font=(None, 12), activestyle=NONE)
         self.lst.grid(row=8, column=0, columnspan=2, padx=20, pady=20, sticky="nsew")
@@ -63,23 +63,30 @@ class MainWindow:
                         try:
                             os.remove(entry)
                             self.lst.insert(END, f'{entry.name} Eliminado con éxito')
-                        except:
-                            pass
+                            self.lst.itemconfig(END, {'fg': 'green'})
+                        except Exception as e:
+                            self.lst.insert(END, f'{e} al eliminar el archivo {entry.name}')
+                            self.lst.itemconfig(END, {'fg': 'red'})
                     elif entry.is_dir():
-                        shutil.rmtree(entry, ignore_errors=True)
-                        self.lst.insert(END, f'Carpeta {entry.name} Eliminada con éxito')
-                    self.lst.itemconfig(END, {'fg': 'green'})
-        if self.lst.size() == 0:
-            self.lst.insert(END, 'No hay elementos para borrar')
-            self.lst.itemconfig(END, {'fg': 'red'})
+                        try:
+                            shutil.rmtree(entry)
+                            self.lst.insert(END, f'Carpeta {entry.name} Eliminada con éxito')
+                            self.lst.itemconfig(END, {'fg': 'green'})
+                        except Exception as e:
+                            self.lst.insert(END, f'{e} al eliminar la carpeta {entry.name}')
+                            self.lst.itemconfig(END, {'fg': 'red'})
 
     def clearAllEventLog(self):
         log_types = ['Application', 'Security', 'Setup', 'System', 'Forwarded Events']
         for logtype in log_types:
-            handle = win32evtlog.OpenEventLog(None, logtype)
-            win32evtlog.ClearEventLog(handle, None)
-            self.lst.insert(END, f'Registo {logtype} limpiado con éxito')
-            self.lst.itemconfig(END, {'fg': 'green'})
+            try:
+                handle = win32evtlog.OpenEventLog(None, logtype)
+                win32evtlog.ClearEventLog(handle, None)
+                self.lst.insert(END, f'Registo {logtype} limpiado con éxito')
+                self.lst.itemconfig(END, {'fg': 'green'})
+            except Exception as e:
+                self.lst.insert(END, f'{e} al eliminar el registro {logtype}')
+                self.lst.itemconfig(END, {'fg': 'red'})
 
     def emptyRecycleBin(self):
         r = list(winshell.recycle_bin())
@@ -114,7 +121,7 @@ class MainWindow:
             self.emptyRecycleBin()
 
     def check_uncheck_children(self):
-        for cb in self.cb_temp_files_child:
+        for cb in self.cb_temp_files_children:
             if self.cb_temp_files_value.get():
                 cb.select()
             else:
