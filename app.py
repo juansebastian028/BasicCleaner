@@ -49,7 +49,7 @@ class MainWindow:
                     variable=self.cb_downloads).grid(row=7, column=0, sticky="w", padx=20)
 
         self.btn_clean = Button(root, text="Limpiar", bg="#3f74d4", fg="#eeeeee", pady=10, padx=10, borderwidth=0,
-                                font=(None, 10), command=self.clear).grid(row=9, column=1, padx=20,
+                                font=(None, 10), command=self.clean).grid(row=9, column=1, padx=20,
                                                                           pady=(0, 20), sticky="e")
 
         self.lst = Listbox(root, borderwidth=0, highlightthickness=0, font=(None, 12), activestyle=NONE)
@@ -92,13 +92,13 @@ class MainWindow:
         r = list(winshell.recycle_bin())
         if len(r) > 0:
             winshell.recycle_bin().empty(confirm=False, show_progress=False, sound=False)
-            self.lst.insert(END, 'Papelera de reciclaje vaciada exitisamente')
+            self.lst.insert(END, 'Papelera de reciclaje vaciada con éxito')
             self.lst.itemconfig(END, {'fg': 'green'})
         else:
             self.lst.insert(END, 'Papelera de reciclaje sin elementos')
             self.lst.itemconfig(END, {'fg': 'red'})
 
-    def clear(self):
+    def clean(self):
 
         if self.lst.size() > 0:
             self.lst.delete(0, END)
@@ -134,10 +134,17 @@ class MainWindow:
             self.cb_temp_files.deselect()
 
 
+def centerWindow(master, width, height):
+    position_right = int(master.winfo_screenwidth() / 2 - width / 2)
+    position_down = int(master.winfo_screenheight() / 3 - height / 2)
+    master.geometry("+{}+{}".format(position_right, position_down))
+
+
 root = Tk()
 root.title("Basic Cleaner")
 root.minsize(width=600, height=400)
 root.grid_columnconfigure(1, weight=1)
 root.grid_rowconfigure(8, weight=1)
+centerWindow(root, 600, 400)
 app = MainWindow(root)
 root.mainloop()
