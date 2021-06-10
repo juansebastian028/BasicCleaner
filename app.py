@@ -15,38 +15,30 @@ class MainWindow:
         self.cb_temp_files_value = BooleanVar()
         self.cb_temp_files = Checkbutton(cb_frame, text="Archivos Temporales", onvalue=True, offvalue=False,
                                          variable=self.cb_temp_files_value, command=self.check_uncheck_children)
-        self.cb_temp_files.grid(row=1, column=0, sticky="w", padx=20)
 
         self.cb_temp_value = BooleanVar()
         self.cb_temp = Checkbutton(cb_frame, text="Temp", onvalue=True, offvalue=False, variable=self.cb_temp_value,
                                    command=self.check_uncheck_parent)
-        self.cb_temp.grid(row=2, column=0, sticky="w", padx=30)
 
         self.cb_temp2_value = BooleanVar()
         self.cb_temp2 = Checkbutton(cb_frame, text="%Temp%", onvalue=True, offvalue=False,
                                     variable=self.cb_temp2_value, command=self.check_uncheck_parent)
-        self.cb_temp2.grid(row=3, column=0, sticky="w", padx=30)
 
         self.cb_prefetch_value = BooleanVar()
         self.cb_prefetch = Checkbutton(cb_frame, text="Prefetch", onvalue=True, offvalue=False,
                                        variable=self.cb_prefetch_value, command=self.check_uncheck_parent)
-        self.cb_prefetch.grid(row=4, column=0, sticky="w", padx=30)
 
-        self.cb_temp_files_children = [self.cb_temp, self.cb_temp2, self.cb_prefetch]
+        self.cb_event_log_value = BooleanVar()
+        self.cb_event_log = Checkbutton(cb_frame, text="Registro Visor Eventos", onvalue=True, offvalue=False,
+                                        variable=self.cb_event_log_value)
 
-        self.cb_event_log = BooleanVar()
-        Checkbutton(cb_frame, text="Registro Visor Eventos", onvalue=True, offvalue=False,
-                    variable=self.cb_event_log).grid(row=5, column=0, sticky="w",
-                                                     padx=20)
+        self.cb_recycle_bin_value = BooleanVar()
+        self.cb_recycle_bin = Checkbutton(cb_frame, text="Papelera de Reciclaje", onvalue=True, offvalue=False,
+                                          variable=self.cb_recycle_bin_value)
 
-        self.cb_recycle_bin = BooleanVar()
-        Checkbutton(cb_frame, text="Papelera de Reciclaje", onvalue=True, offvalue=False,
-                    variable=self.cb_recycle_bin).grid(row=6, column=0, sticky="w",
-                                                       padx=20)
-
-        self.cb_downloads = BooleanVar()
-        Checkbutton(cb_frame, text="Descargas", onvalue=True, offvalue=False,
-                    variable=self.cb_downloads).grid(row=7, column=0, sticky="w", padx=20)
+        self.cb_downloads_value = BooleanVar()
+        self.cb_downloads = Checkbutton(cb_frame, text="Descargas", onvalue=True, offvalue=False,
+                                        variable=self.cb_downloads_value)
 
         self.btn_clean = Button(root, text="Limpiar", bg="#3f74d4", fg="#eeeeee", pady=10, padx=10, borderwidth=0,
                                 font=(None, 10), command=self.clean).grid(row=9, column=1, padx=20,
@@ -54,6 +46,15 @@ class MainWindow:
 
         self.lst = Listbox(root, borderwidth=0, highlightthickness=0, font=(None, 12), activestyle=NONE)
         self.lst.grid(row=8, column=0, columnspan=2, padx=20, pady=20, sticky="nsew")
+
+        self.cb_temp_files.grid(row=1, column=0, sticky="w", padx=20)
+        self.cb_temp.grid(row=2, column=0, sticky="w", padx=30)
+        self.cb_temp2.grid(row=3, column=0, sticky="w", padx=30)
+        self.cb_prefetch.grid(row=4, column=0, sticky="w", padx=30)
+        self.cb_event_log.grid(row=5, column=0, sticky="w", padx=20)
+        self.cb_recycle_bin.grid(row=6, column=0, sticky="w", padx=20)
+        self.cb_downloads.grid(row=7, column=0, sticky="w", padx=20)
+        self.check_all()
 
     def deleteFiles(self, paths):
         for path in paths:
@@ -111,17 +112,24 @@ class MainWindow:
             if self.cb_prefetch_value.get():
                 self.deleteFiles(['C:/Windows/Prefetch'])
 
-        if self.cb_event_log.get():
+        if self.cb_event_log_value.get():
             self.clearAllEventLog()
 
-        if self.cb_downloads.get():
+        if self.cb_downloads_value.get():
             self.deleteFiles([os.path.join(os.path.join(os.environ['USERPROFILE']), 'Downloads')])
 
-        if self.cb_recycle_bin.get():
+        if self.cb_recycle_bin_value.get():
             self.emptyRecycleBin()
 
+    def check_all(self):
+        cb_all = [self.cb_temp_files, self.cb_temp, self.cb_temp2, self.cb_prefetch, self.cb_event_log,
+                  self.cb_recycle_bin, self.cb_downloads]
+        for cb in cb_all:
+            cb.select()
+
     def check_uncheck_children(self):
-        for cb in self.cb_temp_files_children:
+        cb_temp_files_children = [self.cb_temp, self.cb_temp2, self.cb_prefetch]
+        for cb in cb_temp_files_children:
             if self.cb_temp_files_value.get():
                 cb.select()
             else:
